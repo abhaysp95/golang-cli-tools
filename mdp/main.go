@@ -53,8 +53,19 @@ func run(filename string) error {
 
 	htmlData := parseContent(input)
 
-	basename := filepath.Base(filename)
-	outName := fmt.Sprintf("%s.html", strings.TrimSuffix(basename, filepath.Ext(basename)))
+	/* basename := filepath.Base(filename)
+	outName := fmt.Sprintf("%s.html", strings.TrimSuffix(basename, filepath.Ext(basename))) */
+
+	// create temporary file and check for errors
+	temp, err := os.CreateTemp("", "mdp*.html")
+	if err != nil {
+		return err
+	}
+	if err := temp.Close(); err != nil {
+		return err
+	}
+
+	outName := temp.Name()
 	fmt.Println(outName)
 
 	return saveHTML(outName, htmlData)
