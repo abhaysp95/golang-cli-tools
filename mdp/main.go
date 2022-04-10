@@ -4,9 +4,8 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"io"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday/v2"
@@ -38,13 +37,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := run(*filename); err != nil {
+	if err := run(*filename, os.Stdout); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
-func run(filename string) error {
+func run(filename string, out io.Writer) error {
 	// read all the data from the input file and check the error
 	input, err := os.ReadFile(filename)
 	if err != nil {
@@ -66,7 +65,7 @@ func run(filename string) error {
 	}
 
 	outName := temp.Name()
-	fmt.Println(outName)
+	fmt.Fprintln(out, outName)
 
 	return saveHTML(outName, htmlData)
 }
