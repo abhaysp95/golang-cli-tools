@@ -35,7 +35,7 @@ func TestParseContent(t *testing.T) {
 
 func TestRun(t *testing.T) {
 	var mockStdout bytes.Buffer
-	if err := run(inputFile, &mockStdout); err != nil {
+	if err := run(inputFile, &mockStdout, true); err != nil {
 		t.Fatal(err)
 	}
 
