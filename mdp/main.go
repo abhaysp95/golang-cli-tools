@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"time"
 
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday/v2"
@@ -78,6 +79,9 @@ func run(filename string, out io.Writer, skipPreview bool) error {
 		return preview(outName)
 	}
 
+	// clean up the file
+	defer os.Remove(outName)
+
 	return nil
 }
 
@@ -128,5 +132,12 @@ func preview(fname string) error {
 	}
 
 	// Open the file using default program
-	return exec.Command(cPath, cParams...).Run()
+	err =  exec.Command(cPath, cParams...).Run()
+
+	// add the delay, so program waits before quiting
+	time.Sleep(10 * time.Second)
+	// method is not reliable, because it can take much more time to open
+	// browser in old systesm
+
+	return err
 }
