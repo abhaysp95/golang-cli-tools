@@ -118,6 +118,9 @@ func TestRunDelExtenstion(t *testing.T) {
 				tc.extNoDelete: tc.nNoDelete,
 			})
 
+			/* t.Cleanup(func() {  // just like t.Helper, registers function for cleanup
+				os.RemoveAll(tempDir)
+			}) */
 			defer cleanup()
 
 			if err := run(tempDir, &buffer, tc.cfg); err != nil {
