@@ -20,25 +20,31 @@ func filterOut(path, ext, mDate string, minSize uint64, info os.FileInfo) bool {
 		return true
 	}
 
-	if mDate != "" {
-		d, err := time.Parse(DLayout,mDate);
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		if info.ModTime().Before(d) {
-			return true
-		}
+	if mDate == "" {
+		fmt.Fprintln(os.Stderr, "provide date in correct format")
+		os.Exit(1)
+	}
+	d, err := time.Parse(DLayout,mDate);
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	if info.ModTime().Before(d) {
+		return true
 	}
 
+	if ext == "" {
+		return false
+	}
 	exts := strings.Split(ext, ",")
-	for _, ext := range exts {
-		if filepath.Ext(path) == ext {
-			 return true
+	filterExt := true
+	for _, e := range exts {
+		if filepath.Ext(path) == e {
+			filterExt = false
+			break
 		}
 	}
-
-	return false
+	return filterExt  // since this is the last check
 }
 
 func listFile(path string, out io.Writer) error {
