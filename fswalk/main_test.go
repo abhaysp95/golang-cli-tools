@@ -15,25 +15,26 @@ func TestRun(t *testing.T) {
 		root string
 		cfg config
 		expected string
+		date string
 	} {
 		{name: "NoFilter", root: "testdata",
-		cfg: config{ext: "", size: 0, list: true},
+		cfg: config{ext: "", size: 0, list: true, mDate: "1901-01-01"},
 		expected: "testdata/dir.log\ntestdata/dir2/script.sh\n"},
 
 		{name: "FilterExtensionMatch", root: "testdata",
-		cfg: config{ext: ".log", size: 0, list: true},
+		cfg: config{ext: ".log", size: 0, list: true, mDate: "1901-01-01"},
 		expected: "testdata/dir.log\n"},
 
 		{name: "FilterExtensionSizeMatch", root: "testdata",
-		cfg: config{ext: ".log", size: 10, list: true},
+		cfg: config{ext: ".log", size: 10, list: true, mDate: "1901-01-01"},
 		expected: "testdata/dir.log\n"},
 
 		{name: "FilterExtensionSizeNoMatch", root: "testdata",
-		cfg: config{ext: ".log", size: 20, list: true},
+		cfg: config{ext: ".log", size: 20, list: true, mDate: "1901-01-01"},
 		expected: ""},
 
 		{name: "FilterExtensionNoMatch", root: "testdata",
-		cfg: config{ext: ".gz", size: 0, list: true},
+		cfg: config{ext: ".gz", size: 0, list: true, mDate: "1901-01-01"},
 		expected: ""},
 	}
 
@@ -86,7 +87,7 @@ func TestRunDelExtenstion(t *testing.T) {
 	} {
 		{
 			name: "DeleteExtensionNoMatch",
-			cfg: config{ext: ".log", del: true},
+			cfg: config{ext: ".log", del: true, mDate: "1901-01-01"},
 			extNoDelete: ".gz",
 			nDelete: 0,
 			nNoDelete: 10,
@@ -94,7 +95,7 @@ func TestRunDelExtenstion(t *testing.T) {
 		},
 		{
 			name: "DeleteExtensionatch",
-			cfg: config{ext: ".log", del: true},
+			cfg: config{ext: ".log", del: true, mDate: "1901-01-01"},
 			extNoDelete: ".gz",
 			nDelete: 10,
 			nNoDelete: 0,
@@ -102,10 +103,18 @@ func TestRunDelExtenstion(t *testing.T) {
 		},
 		{
 			name: "DeleteExtensionMixed",
-			cfg: config{ext: ".log", del: true},
+			cfg: config{ext: ".log", del: true, mDate: "1901-01-01"},
 			extNoDelete: ".gz",
 			nDelete: 5,
 			nNoDelete: 5,
+			expected: "",
+		},
+		{
+			name: "DeleteExtensionDateMatch",
+			cfg: config{ext: ".log", del: true, mDate: "2022-05-15"},
+			extNoDelete: ".gz",
+			nDelete: 10,
+			nNoDelete: 1,
 			expected: "",
 		},
 	}
@@ -168,21 +177,28 @@ func TestRunArchive(t *testing.T) {
 	} {
 		{
 			name: "ArchiveExtensionNoMatch",
-			cfg: config{ext: ".log"},
+			cfg: config{ext: ".log", mDate: "1901-01-01"},
 			extNoArchive: ".gz",
 			nArchive: 0,
 			nNoArchive: 10,
 		},
 		{
 			name: "ArchiveExtensionMatch",
-			cfg: config{ext: ".log"},
+			cfg: config{ext: ".log", mDate: "1901-01-01"},
 			extNoArchive: "",
 			nArchive: 10,
 			nNoArchive: 0,
 		},
 		{
 			name: "ArchiveExtensionMixed",
-			cfg: config{ext: ".log"},
+			cfg: config{ext: ".log", mDate: "1901-01-01"},
+			extNoArchive: ".gz",
+			nArchive: 5,
+			nNoArchive: 5,
+		},
+		{
+			name: "ArchiveExtensionDateMixed",
+			cfg: config{ext: ".log", mDate: "2022-05-15"},
 			extNoArchive: ".gz",
 			nArchive: 5,
 			nNoArchive: 5,
