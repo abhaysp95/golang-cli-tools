@@ -101,7 +101,7 @@ func TestRun(t *testing.T) {
 	}
 }
 
-func BenchmarkRun(b *testing.B) {
+func BenchmarkAvgRun(b *testing.B) {
 	filenames, err := filepath.Glob("./testdata/*.csv")
 	if err != nil {
 		b.Fatal(err)
