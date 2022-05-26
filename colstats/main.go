@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	op := flag.String("op", "sum", "operation to perform")
+	op := flag.String("op", "sum", "operation to perform (sum,avg,min,max)")
 	column := flag.Int("col", 1, `CSV column to execute operation on
 	(starts from 1)`)
 
@@ -40,6 +40,10 @@ func run(filenames []string, op string, col int, out io.Writer) error {
 		opFunc = sum
 	case "avg":
 		opFunc = avg
+	case "min":
+		opFunc = min
+	case "max":
+		opFunc = max
 	default:
 		return fmt.Errorf("%w: %s", ErrInvalidOperation, op)
 	}
