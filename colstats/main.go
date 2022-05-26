@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"sync"
 )
 
@@ -46,35 +47,45 @@ func run(filenames []string, op string, col int, out io.Writer) error {
 	resCh := make(chan []float64)
 	errCh := make(chan error)
 	doneCh := make(chan struct{})
+	filesCh := make(chan string)
 
-	consolidate := make([]float64, 0)
-	for _, file := range filenames {
+	go func() {
+		defer close(filesCh)
+		for _, file := range filenames {
+			filesCh <- file;
+		}
+	}()
+
+	for i := 0; i < runtime.NumCPU(); i++ {
 		wg.Add(1)
 
-		go func(name string) {
+		go func() {
 			defer wg.Done()
 
-			// open file
-			f, err := os.Open(name)
-			if err != nil {
-				errCh <- fmt.Errorf("Cannot open file: %w", err)
-				return
+			for file := range filesCh {
+				// open the file
+				f, err := os.Open(file)
+				if err != nil {
+					errCh <- fmt.Errorf("Cannot open file: %w", err)
+					return
+				}
+
+				// parse CSV
+				res, err := csv2float(f, col)
+				if err != nil {
+					errCh <- err
+				}
+
+				if err := f.Close(); err != nil {
+					errCh <- err
+				}
+
+				resCh <- res
 			}
-
-			// parse CSV
-			data, err := csv2float(f, col)
-			if err != nil {
-				errCh <- err
-			}
-
-			if err := f.Close(); err != nil {
-				errCh <- err
-			}
-
-			resCh <- data
-		}(file)
-
+		}()
 	}
+
+	consolidate := make([]float64, 0)
 
 	// wait for all other goroutines to finish (basically wg counter to 0)
 	go func() {
