@@ -3,38 +3,59 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"testing"
 )
 
 func TestRun(t *testing.T) {
+	_, err := exec.LookPath("git")
+	if err != nil {
+		t.Skip("Git not installed. Test skipped!!!")
+	}
+
 	testCases := []struct {
-		name   string
-		proj   string
-		out    string
-		expErr error
+		name     string
+		proj     string
+		out      string
+		expErr   error
+		setupGit bool
 	}{
 		{
-			name:   "success",
-			proj:   "./testdata/tool",
-			out:    "Go Build: SUCCESS\nGo Test: SUCCESS\nGofmt: SUCCESS\n",
-			expErr: nil,
+			name: "success",
+			proj: "./testdata/tool",
+			out: "Go Build: SUCCESS\n" +
+				"Go Test: SUCCESS\n" +
+				"Gofmt: SUCCESS\n" +
+				"Git Push: SUCCESS\n",
+			expErr:   nil,
+			setupGit: true,
 		},
 		{
-			name:   "fail",
-			proj:   "./testdata/toolErr",
-			out:    "",
-			expErr: &stepErr{step: "go build"},
+			name:     "fail",
+			proj:     "./testdata/toolErr",
+			out:      "",
+			expErr:   &stepErr{step: "go build"},
+			setupGit: false,
 		},
 		{
-			name: "failFormat",
-			proj: "./testdata/toolfmt",
-			out: "",
-			expErr: &stepErr{step: "go fmt"},
+			name:     "failFormat",
+			proj:     "./testdata/toolfmt",
+			out:      "",
+			expErr:   &stepErr{step: "go fmt"},
+			setupGit: false,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.setupGit {
+				cleanup := setupGit(t, tc.proj)
+				defer cleanup()
+			}
+
 			var out bytes.Buffer
 
 			err := run(tc.proj, &out)
