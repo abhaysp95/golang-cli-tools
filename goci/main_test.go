@@ -25,6 +25,12 @@ func TestRun(t *testing.T) {
 			out:    "",
 			expErr: &stepErr{step: "go build"},
 		},
+		{
+			name: "failFormat",
+			proj: "./testdata/toolfmt",
+			out: "",
+			expErr: &stepErr{step: "go fmt"},
+		},
 	}
 
 	for _, tc := range testCases {
