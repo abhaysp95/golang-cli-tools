@@ -69,8 +69,8 @@ func TestRun(t *testing.T) {
 					t.Errorf("type match")
 				} */
 
-				if !errors.Is(err, tc.expErr) {  // <-- looks like custom Is() is not getting called
-				// if errors.Is(errors.Unwrap(err), tc.expErr) {  // this is working
+				if !errors.Is(err, tc.expErr) { // <-- looks like custom Is() is not getting called
+					// if errors.Is(errors.Unwrap(err), tc.expErr) {  // this is working
 					t.Errorf("Expected error: %q. Got: %q.", tc.expErr, err)
 				}
 				return
