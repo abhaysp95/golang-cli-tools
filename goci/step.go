@@ -14,7 +14,7 @@ func newStep(name, exe, message, proj string, args []string) step {
 	return step{name, exe, args, message, proj}
 }
 
-func (s *step) execute() (string, error) {
+func (s step) execute() (string, error) {  // interfaces have problem with method with pointer reciever ?
 	cmd := exec.Command(s.exe, s.args...)
 	cmd.Dir = s.proj
 
