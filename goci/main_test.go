@@ -63,3 +63,75 @@ func TestRun(t *testing.T) {
 		})
 	}
 }
+
+func setupGit(t *testing.T, proj string) func() { // returns cleanup function
+	t.Helper()
+
+	gitExec, err := exec.LookPath("git")
+	if err != nil {
+		t.Fatal(err)
+	}
+	tempDir, err := os.MkdirTemp("", "gocitest")
+	if err != nil {
+		t.Fatal(err)
+	}
+	projPath, err := filepath.Abs(proj)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	remoteURI := fmt.Sprintf("file://%s", tempDir)
+	var gitCmdList = []struct {
+		args []string
+		dir  string
+		env  []string
+	}{
+		{
+			[]string{"init", "--bare"},
+			tempDir, nil,
+		},
+		{
+			[]string{"init"},
+			projPath, nil,
+		},
+		{
+			[]string{"remote", "add", "origin", remoteURI},
+			projPath, nil,
+		},
+		{
+			[]string{"add", "."},
+			projPath, nil,
+		},
+		{
+			[]string{"commit", "-m", "test"},
+			projPath,
+			/* []string{
+				"GIT_COMMITER_NAME=test",
+				"GIT_COMMITER_EMAIL=test@example.com",
+				"GIT_AUTHOR_NAME=test",
+				"GIT_COMMITER_EMAIL=test@example.com",
+			}, */
+			nil,
+		},
+	}
+
+	for _, g := range gitCmdList {
+		gitCmd := exec.Command(gitExec, g.args...)
+
+		gitCmd.Dir = g.dir
+		if g.env != nil {
+			fmt.Println("1")
+			gitCmd.Env = append(gitCmd.Env, g.env...)
+		}
+
+		if err := gitCmd.Run(); err != nil {
+			fmt.Println("2")
+			t.Fatal(err)
+		}
+	}
+
+	return func() {
+		os.RemoveAll(tempDir)
+		os.RemoveAll(filepath.Join(projPath, ".git"))
+	}
+}
