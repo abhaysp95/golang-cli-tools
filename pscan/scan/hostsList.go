@@ -71,4 +71,12 @@ func (hl *HostsList) Load(hostsFile string) error {
 	return nil
 }
 
+// Save saves the hosts to a host file
+func (hl *HostsList) Save(hostsFile string) error {
+	output := ""
+	for _, h := range hl.Hosts {
+		output += h
+	}
 
+	return os.WriteFile(hostsFile, []byte(output), 0644)
+}
