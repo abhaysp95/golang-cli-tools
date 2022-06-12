@@ -22,8 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -36,9 +34,9 @@ var hostsCmd = &cobra.Command{
 Add hosts with add command
 Delete hosts with delete command
 List hosts with list command.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	/* Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("hosts called")
-	},
+	}, */
 }
 
 func init() {
