@@ -75,7 +75,7 @@ func (hl *HostsList) Load(hostsFile string) error {
 func (hl *HostsList) Save(hostsFile string) error {
 	output := ""
 	for _, h := range hl.Hosts {
-		output += h
+		output += fmt.Sprintln(h)
 	}
 
 	return os.WriteFile(hostsFile, []byte(output), 0644)
