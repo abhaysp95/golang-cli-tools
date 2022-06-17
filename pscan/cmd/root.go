@@ -79,6 +79,8 @@ func init() {
 
 	versionTemplate := `{{printf "%s: %s - version %s\n" .Name .Short .Version}}`
 	rootCmd.SetVersionTemplate(versionTemplate)
+
+	// just a hint, generate completion with cobra like rootCmd.GenBashCompletion(<out>) etc.
 }
 
 func initConfig() {
